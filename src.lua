@@ -1,3 +1,4 @@
+-- full working setreadonly
 local function setreadonly(obj, value)
     local mt = getmetatable(obj)
     
@@ -23,6 +24,7 @@ local function setreadonly(obj, value)
         error("unable to safely freeze table")
     end
 end
+-- full working getrawmetatable
 local function getrawmetatable(obj)
     local meta = getmetatable(obj)
     if meta and meta.__index == meta then
@@ -30,6 +32,7 @@ local function getrawmetatable(obj)
     end
     return nil
 end
+-- non-hookmetamethod
 local function hookmetamethod(object, method, newFunction)
     local meta = getrawmetatable(object)
     if meta then
@@ -95,6 +98,7 @@ local function cryptrandom(number,size)
     end
     return result
 end
+-- non-getconnections
 local function getconnections()
     local connections = {}
     for _, v in pairs(game:GetDescendants()) do
