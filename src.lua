@@ -95,9 +95,9 @@ local function cryptrandom(number,size)
     end
     return result
 end
-local function getconnections(obj)
+local function getconnections()
     local connections = {}
-    for _, v in pairs(obj:GetChildren()) do
+    for _, v in pairs(game:GetDescendants()) do
         if v:IsA("RemoteEvent") or v:IsA("RemoteFunction") or v:IsA("BindableEvent") or v:IsA("BindableFunction") then
             for _, connection in pairs(v:GetChildren()) do
                 if connection:IsA("Connection") then
