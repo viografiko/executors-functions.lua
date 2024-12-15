@@ -287,3 +287,39 @@ local function _cclosure(func)
 end
 
 return _cclosure
+-- newcclosure full
+local function newcclosure(f)
+    if type(f) ~= "function" then
+        error("Expected a function, got " .. type(f), 2)
+    end
+
+    local function cclosure(...)
+        return f(...)
+    end
+
+    local mt = {
+        __call = function(_, ...)
+            return f(...)
+        end,
+        __mode = "v" 
+    }
+    setmetatable(cclosure, mt)
+
+    local function strip_upvalues(func)
+        local upvalue_count = debug.getinfo(func, "u").nups
+        for i = 1, upvalue_count do
+            debug.setupvalue(func, i, nil)
+        end
+    end
+
+    local success, err = pcall(function()
+        strip_upvalues(cclosure)
+    end)
+    if not success then
+        warn("Failed to strip upvalues: " .. tostring(err))
+    end
+
+    return cclosure
+end
+
+return newcclosure
