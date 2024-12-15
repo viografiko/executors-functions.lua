@@ -183,6 +183,7 @@ local function getthreadcontext()
 
     return contextInfo
 end
+-- full isreadonly
 local function isreadonly(table)
     if type(table) ~= "table" then
         return false
@@ -200,4 +201,62 @@ local function isreadonly(table)
     end)
 
     return not isReadonly
+end
+-- non-require upgraded
+local function require(object)
+    if object == nil then
+        error("Cannot require a nil object", 2)
+    end
+
+    if typeof(object) == "Instance" then
+        local success, result
+
+        if object:IsA("ModuleScript") then
+            success, result = pcall(function()
+                return _G.originalRequire(object)
+            end)
+            if success then
+                return result
+            else
+                error(string.format("Failed to require ModuleScript '%s': %s", object.Name, result), 2)
+            end
+        elseif object:IsA("Script") or object:IsA("LocalScript") then
+            success, result = pcall(function()
+                local loadedFunc = loadstring(object.Source)
+                if not loadedFunc then
+                    error("Failed to load script source")
+                end
+                local env = setmetatable({}, { __index = _G })
+                setfenv(loadedFunc, env)
+                return loadedFunc()
+            end)
+            if success then
+                return result
+            else
+                error(string.format("Failed to process script '%s': %s", object.Name, result), 2)
+            end
+        else
+            error(string.format("Cannot require Instance of type '%s'", object.ClassName), 2)
+        end
+    elseif typeof(object) == "table" or typeof(object) == "function" then
+        return object
+    elseif typeof(object) == "string" then
+        local success, module = pcall(function()
+            local current = game
+            for part in object:gmatch("[^.]+") do
+                current = current:FindFirstChild(part)
+                if not current then
+                    error("Could not find object at path: " .. object, 2)
+                end
+            end
+            return require(current)
+        end)
+        if success then
+            return module
+        else
+            error(string.format("Failed to require module at path '%s': %s", object, module), 2)
+        end
+    else
+        error(string.format("Unsupported type for require: %s", typeof(object)), 2)
+    end
 end
