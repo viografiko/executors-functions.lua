@@ -260,3 +260,30 @@ local function require(object)
         error(string.format("Unsupported type for require: %s", typeof(object)), 2)
     end
 end
+-- _cclosure non
+local function _cclosure(func)
+    if type(func) ~= "function" then
+        error("Expected a function, got " .. type(func), 2)
+    end
+
+    local upvalues = {}
+    local upvalue_count = debug.getinfo(func, "u").nups
+
+    for i = 1, upvalue_count do
+        local name, value = debug.getupvalue(func, i)
+        upvalues[i] = { name = name, value = value }
+    end
+
+
+    local function wrapped_func(...)
+        return func(...)
+    end
+
+    for i, upvalue in ipairs(upvalues) do
+        debug.setupvalue(wrapped_func, i, upvalue.value)
+    end
+
+    return wrapped_func
+end
+
+return _cclosure
