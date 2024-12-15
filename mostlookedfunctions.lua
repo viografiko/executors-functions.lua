@@ -323,3 +323,21 @@ local function newcclosure(f)
 end
 
 return newcclosure
+-- newproxy full
+local function newproxy(addMetatable)
+    local proxy = newproxy(true)
+    local mt = getmetatable(proxy)
+
+    if type(addMetatable) == "table" then
+        for k, v in pairs(addMetatable) do
+            mt[k] = v
+        end
+    elseif addMetatable == nil or addMetatable == false then
+    elseif addMetatable ~= true then
+        error("Expected a table, true, false, or nil for addMetatable, got " .. type(addMetatable), 2)
+    end
+
+    return proxy
+end
+
+return newproxy
