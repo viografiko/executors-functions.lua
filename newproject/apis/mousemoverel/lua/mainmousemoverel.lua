@@ -16,7 +16,7 @@ local function mousemoverel(x, y)
 	end)
 
 	if success then
-		print("sucess 200:", response)
+		--print("sucess 200:", response)
 	else
 		warn("error 404:", response)
 	end
