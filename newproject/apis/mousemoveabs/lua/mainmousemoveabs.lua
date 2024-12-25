@@ -1,3 +1,7 @@
+--[[
+ PLEASE CHECK, I MADED THIS AT ROBLOX STUDIO, SO MAKE SURE TO REMOVE POSTASYNC
+AND USE A HTTPLIB.
+]]
 local HttpService = game:GetService("HttpService")
 
 local function mousemoveabs(x, y)
